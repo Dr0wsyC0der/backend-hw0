@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"os"
 )
 
 func handleConnection(conn net.Conn) {
@@ -14,21 +15,26 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
-func main() {
+func run() error {
 	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
-		fmt.Println("Error starting server:", err)
-		return
+		return err
 	}
 	defer listener.Close()
+	fmt.Println("Server is listening on port 8080...")
 	for {
-		fmt.Println("Server is listening on port 8080...")
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("Error accepting connection:", err)
-			return
+			return err
 		}
 		handleConnection(conn)
+	}
+}
+
+func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 
 }
